@@ -8,6 +8,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // final wordPair = WordPair.random();
     return MaterialApp(
+      theme: ThemeData(
+        // Add the 3 lines from here...
+        primaryColor: Colors.teal,
+      ),
       title: 'Welcome to Flutter',
       home: Scaffold(
         appBar: AppBar(
@@ -27,7 +31,12 @@ class TestWidget extends StatefulWidget {
 }
 
 class _TestWidgetState extends State<TestWidget> {
+  // a List to store all the generated word pairs
   final _suggestions = <WordPair>[];
+
+  // a Set to save favorites pairs chosen by a user.
+  final _saved = <WordPair>{};
+
   final _biggerFont = const TextStyle(fontSize: 18);
 
   @override
@@ -40,8 +49,40 @@ class _TestWidgetState extends State<TestWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Startup Name Generator'),
+        actions: [
+          IconButton(icon: Icon(Icons.navigate_next), onPressed: _pushSaved),
+        ],
       ),
       body: _buildSuggestions(),
+    );
+  }
+
+  void _pushSaved() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          final tiles = _saved.map(
+            (WordPair pair) {
+              return ListTile(
+                title: Text(
+                  pair.asPascalCase,
+                  style: _biggerFont,
+                ),
+              );
+            },
+          );
+          final divided = tiles.isNotEmpty
+              ? ListTile.divideTiles(context: context, tiles: tiles).toList()
+              : <Widget>[];
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Saved Suggestions'),
+            ),
+            body: ListView(children: divided),
+          );
+        }, // ...to here.
+      ),
     );
   }
 
@@ -76,11 +117,29 @@ class _TestWidgetState extends State<TestWidget> {
   }
 
   Widget _buildRow(WordPair pair) {
+    //check if a pair of words has already been saved.
+    final alreadySaved = _saved.contains(pair);
+
     return ListTile(
       title: Text(
         pair.asPascalCase,
         style: _biggerFont,
       ),
+      trailing: Icon(
+        alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: alreadySaved ? Colors.red : null,
+      ),
+      onTap: () {
+        setState(() {
+          if (alreadySaved) {
+            _saved.remove(pair);
+            print('rm from favorite list');
+          } else {
+            _saved.add(pair);
+            print('add to favorite list');
+          }
+        });
+      },
     );
   }
 }

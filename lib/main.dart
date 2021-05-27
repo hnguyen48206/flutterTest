@@ -8,6 +8,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // final wordPair = WordPair.random();
     return MaterialApp(
+      initialRoute: '/',
+      routes: <String, WidgetBuilder>{
+        '/': (BuildContext context) => TestWidget(),
+      },
+      onUnknownRoute: (RouteSettings setting) {
+        String unknownRoute = setting.name;
+        return new MaterialPageRoute(builder: (context) => NotFoundPage());
+      },
       theme: ThemeData(
         // Add the 3 lines from here...
         primaryColor: Colors.teal,
@@ -21,6 +29,18 @@ class MyApp extends StatelessWidget {
           child: TestWidget(),
         ),
       ),
+    );
+  }
+}
+
+class NotFoundPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Scaffold(
+          body: Center(
+        child: Text('Not found page'),
+      )),
     );
   }
 }
@@ -73,7 +93,7 @@ class _TestWidgetState extends State<TestWidget> {
           );
           final divided = tiles.isNotEmpty
               ? ListTile.divideTiles(context: context, tiles: tiles).toList()
-              : <Widget>[];
+              : <ListTile>[];
 
           return Scaffold(
             appBar: AppBar(

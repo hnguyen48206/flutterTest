@@ -11,6 +11,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) => TestWidget(),
+        '/favoriteItemList': (BuildContext context) =>
+            _TestWidgetState().pushSaved()
       },
       onUnknownRoute: (RouteSettings setting) {
         String unknownRoute = setting.name;
@@ -20,10 +22,10 @@ class MyApp extends StatelessWidget {
         // Add the 3 lines from here...
         primaryColor: Colors.teal,
       ),
-      title: 'Welcome to Flutter',
+      title: 'Test Project',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Welcome to Flutter'),
+          title: const Text('Test Project'),
         ),
         body: Center(
           child: TestWidget(),
@@ -70,41 +72,67 @@ class _TestWidgetState extends State<TestWidget> {
       appBar: AppBar(
         title: Text('Startup Name Generator'),
         actions: [
-          IconButton(icon: Icon(Icons.navigate_next), onPressed: _pushSaved),
+          IconButton(
+              icon: Icon(Icons.navigate_next),
+              onPressed: () {
+                Navigator.pushNamed(context, 'favoriteItemList');
+              }),
         ],
       ),
       body: _buildSuggestions(),
     );
   }
 
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          final tiles = _saved.map(
-            (WordPair pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-          final divided = tiles.isNotEmpty
-              ? ListTile.divideTiles(context: context, tiles: tiles).toList()
-              : <ListTile>[];
+  Widget pushSaved() {
+    final tiles = _saved.map(
+      (WordPair pair) {
+        return ListTile(
+          title: Text(
+            pair.asPascalCase,
+            style: _biggerFont,
+          ),
+        );
+      },
+    );
+    final divided = tiles.isNotEmpty
+        ? ListTile.divideTiles(context: context, tiles: tiles).toList()
+        : <ListTile>[];
 
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Suggestions'),
-            ),
-            body: ListView(children: divided),
-          );
-        }, // ...to here.
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Saved Suggestions'),
       ),
+      body: ListView(children: divided),
     );
   }
+  // void _pushSaved() {
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute<void>(
+  //       builder: (BuildContext context) {
+  //         final tiles = _saved.map(
+  //           (WordPair pair) {
+  //             return ListTile(
+  //               title: Text(
+  //                 pair.asPascalCase,
+  //                 style: _biggerFont,
+  //               ),
+  //             );
+  //           },
+  //         );
+  //         final divided = tiles.isNotEmpty
+  //             ? ListTile.divideTiles(context: context, tiles: tiles).toList()
+  //             : <ListTile>[];
+
+  //         return Scaffold(
+  //           appBar: AppBar(
+  //             title: Text('Saved Suggestions'),
+  //           ),
+  //           body: ListView(children: divided),
+  //         );
+  //       }, // ...to here.
+  //     ),
+  //   );
+  // }
 
   // ignore: unused_element
   Widget _buildSuggestions() {

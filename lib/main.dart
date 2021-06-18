@@ -8,30 +8,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // final wordPair = WordPair.random();
     return MaterialApp(
-      initialRoute: '/',
-      routes: <String, WidgetBuilder>{
-        '/': (BuildContext context) => TestWidget(),
-        '/favoriteItemList': (BuildContext context) =>
-            _TestWidgetState().pushSaved()
-      },
-      onUnknownRoute: (RouteSettings setting) {
-        String unknownRoute = setting.name;
-        return new MaterialPageRoute(builder: (context) => NotFoundPage());
-      },
-      theme: ThemeData(
-        // Add the 3 lines from here...
-        primaryColor: Colors.teal,
-      ),
-      title: 'Test Project',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Test Project'),
+        initialRoute: '/',
+        routes: <String, WidgetBuilder>{
+          '/': (context) => TestWidget(),
+          'favoriteItemList': (context) => FavoriteWiget()
+        },
+        onUnknownRoute: (RouteSettings setting) {
+          String unknownRoute = setting.name;
+          return new MaterialPageRoute(builder: (context) => NotFoundPage());
+        },
+        theme: ThemeData(
+          // Add the 3 lines from here...
+          primaryColor: Colors.teal,
         ),
-        body: Center(
-          child: TestWidget(),
-        ),
-      ),
-    );
+        title: 'Test Project');
   }
 }
 
@@ -48,11 +38,6 @@ class NotFoundPage extends StatelessWidget {
 }
 
 class TestWidget extends StatefulWidget {
-  @override
-  _TestWidgetState createState() => _TestWidgetState();
-}
-
-class _TestWidgetState extends State<TestWidget> {
   // a List to store all the generated word pairs
   final _suggestions = <WordPair>[];
 
@@ -61,6 +46,13 @@ class _TestWidgetState extends State<TestWidget> {
 
   final _biggerFont = const TextStyle(fontSize: 18);
 
+  final _TestWidgetState testWidgetState = _TestWidgetState();
+
+  @override
+  _TestWidgetState createState() => testWidgetState;
+}
+
+class _TestWidgetState extends State<TestWidget> {
   @override
   Widget build(BuildContext context) {
     //return single value
@@ -75,7 +67,9 @@ class _TestWidgetState extends State<TestWidget> {
           IconButton(
               icon: Icon(Icons.navigate_next),
               onPressed: () {
-                Navigator.pushNamed(context, 'favoriteItemList');
+                Navigator.pushNamed(context, 'favoriteItemList',
+                    arguments: DataToPassFromTestWidgetToFavoriteWidget(
+                        widget._saved));
               }),
         ],
       ),
@@ -83,56 +77,34 @@ class _TestWidgetState extends State<TestWidget> {
     );
   }
 
-  Widget pushSaved() {
-    final tiles = _saved.map(
-      (WordPair pair) {
-        return ListTile(
-          title: Text(
-            pair.asPascalCase,
-            style: _biggerFont,
-          ),
-        );
-      },
-    );
-    final divided = tiles.isNotEmpty
-        ? ListTile.divideTiles(context: context, tiles: tiles).toList()
-        : <ListTile>[];
+  void _pushSaved() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          final tiles = widget._saved.map(
+            (WordPair pair) {
+              return ListTile(
+                title: Text(
+                  pair.asPascalCase,
+                  style: widget._biggerFont,
+                ),
+              );
+            },
+          );
+          final divided = tiles.isNotEmpty
+              ? ListTile.divideTiles(context: context, tiles: tiles).toList()
+              : <ListTile>[];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Saved Suggestions'),
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Saved Suggestions'),
+            ),
+            body: ListView(children: divided),
+          );
+        }, // ...to here.
       ),
-      body: ListView(children: divided),
     );
   }
-  // void _pushSaved() {
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute<void>(
-  //       builder: (BuildContext context) {
-  //         final tiles = _saved.map(
-  //           (WordPair pair) {
-  //             return ListTile(
-  //               title: Text(
-  //                 pair.asPascalCase,
-  //                 style: _biggerFont,
-  //               ),
-  //             );
-  //           },
-  //         );
-  //         final divided = tiles.isNotEmpty
-  //             ? ListTile.divideTiles(context: context, tiles: tiles).toList()
-  //             : <ListTile>[];
-
-  //         return Scaffold(
-  //           appBar: AppBar(
-  //             title: Text('Saved Suggestions'),
-  //           ),
-  //           body: ListView(children: divided),
-  //         );
-  //       }, // ...to here.
-  //     ),
-  //   );
-  // }
 
   // ignore: unused_element
   Widget _buildSuggestions() {
@@ -155,23 +127,23 @@ class _TestWidgetState extends State<TestWidget> {
           final int index = i ~/ 2;
           // If you've reached the end of the available word
           // pairings...
-          if (index >= _suggestions.length) {
+          if (index >= widget._suggestions.length) {
             // ...then generate 10 more and add them to the
             // suggestions list.
-            _suggestions.addAll(generateWordPairs().take(10));
+            widget._suggestions.addAll(generateWordPairs().take(10));
           }
-          return _buildRow(_suggestions[index]);
+          return _buildRow(widget._suggestions[index]);
         });
   }
 
   Widget _buildRow(WordPair pair) {
     //check if a pair of words has already been saved.
-    final alreadySaved = _saved.contains(pair);
+    final alreadySaved = widget._saved.contains(pair);
 
     return ListTile(
       title: Text(
         pair.asPascalCase,
-        style: _biggerFont,
+        style: widget._biggerFont,
       ),
       trailing: Icon(
         alreadySaved ? Icons.favorite : Icons.favorite_border,
@@ -180,14 +152,55 @@ class _TestWidgetState extends State<TestWidget> {
       onTap: () {
         setState(() {
           if (alreadySaved) {
-            _saved.remove(pair);
+            widget._saved.remove(pair);
             print('rm from favorite list');
+            print(widget._saved);
           } else {
-            _saved.add(pair);
+            widget._saved.add(pair);
             print('add to favorite list');
+            print(widget._saved);
           }
         });
       },
+    );
+  }
+}
+
+class DataToPassFromTestWidgetToFavoriteWidget {
+  var _saved = <WordPair>{};
+
+  DataToPassFromTestWidgetToFavoriteWidget(this._saved);
+}
+
+class FavoriteWiget extends StatefulWidget {
+  @override
+  _FavoriteWigetState createState() => _FavoriteWigetState();
+}
+
+class _FavoriteWigetState extends State<FavoriteWiget> {
+  @override
+  Widget build(BuildContext context) {
+    final args = ModalRoute.of(context).settings.arguments
+        as DataToPassFromTestWidgetToFavoriteWidget;
+
+   final tiles = args._saved.map(
+      (WordPair pair) {
+        return ListTile(
+          title: Text(
+            pair.asPascalCase
+          ),
+        );
+      },
+    );
+    final divided = tiles.isNotEmpty
+        ? ListTile.divideTiles(context: context, tiles: tiles).toList()
+        : <ListTile>[];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Saved Suggestions'),
+      ),
+      body: ListView(children: divided),
     );
   }
 }

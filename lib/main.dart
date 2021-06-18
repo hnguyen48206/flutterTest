@@ -178,17 +178,22 @@ class FavoriteWiget extends StatefulWidget {
 }
 
 class _FavoriteWigetState extends State<FavoriteWiget> {
+  bool shouldPop = true;
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context).settings.arguments
         as DataToPassFromTestWidgetToFavoriteWidget;
 
-   final tiles = args._saved.map(
+    final tiles = args._saved.map(
       (WordPair pair) {
         return ListTile(
-          title: Text(
-            pair.asPascalCase
-          ),
+          title: Text(pair.asPascalCase),
+          onTap: () {
+            setState(() {
+              args._saved.remove(pair);
+              print(args._saved);
+            });
+          },
         );
       },
     );
@@ -196,11 +201,18 @@ class _FavoriteWigetState extends State<FavoriteWiget> {
         ? ListTile.divideTiles(context: context, tiles: tiles).toList()
         : <ListTile>[];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Saved Suggestions'),
-      ),
-      body: ListView(children: divided),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          print('about to pop back');
+          // return shouldPop;
+          Navigator.pop(context, false);
+          return shouldPop;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Saved Suggestions'),
+          ),
+          body: ListView(children: divided),
+        ));
   }
 }

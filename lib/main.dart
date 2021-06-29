@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'package:testnewproject/introPage/introUI.dart';
+import 'splashPage/splashUI.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  Widget homeScreen = SplashUI();
+
   @override
   Widget build(BuildContext context) {
     // final wordPair = WordPair.random();
     return MaterialApp(
         initialRoute: '/',
         routes: <String, WidgetBuilder>{
-          '/': (context) => TestWidget(),
-          'favoriteItemList': (context) => FavoriteWiget()
+          '/': (context) => homeScreen,
+          'favoriteItemList': (context) => FavoriteWiget(),
+          'intro': (context) => IntroUI()
         },
         onUnknownRoute: (RouteSettings setting) {
           String unknownRoute = setting.name;
@@ -70,6 +75,11 @@ class _TestWidgetState extends State<TestWidget> {
                 Navigator.pushNamed(context, 'favoriteItemList',
                     arguments: DataToPassFromTestWidgetToFavoriteWidget(
                         widget._saved));
+              }),
+          IconButton(
+              icon: Icon(Icons.add_chart),
+              onPressed: () {
+                Navigator.pushNamed(context, 'intro');
               }),
         ],
       ),

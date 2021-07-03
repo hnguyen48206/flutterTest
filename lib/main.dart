@@ -2,16 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:testnewproject/introPage/introUI.dart';
 import 'splashPage/splashUI.dart';
+import 'providers/globalHeroProvider.dart' as globalHero;
 
 void main() => runApp(MyApp());
+final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+Widget homeScreen;
 
 class MyApp extends StatelessWidget {
-  Widget homeScreen = SplashUI();
-
   @override
   Widget build(BuildContext context) {
     // final wordPair = WordPair.random();
+    if (!globalHero.isLoggedIn)
+      homeScreen = SplashUI();
+    else
+      homeScreen = TestWidget();
+
     return MaterialApp(
+        navigatorKey: navigatorKey,
         initialRoute: '/',
         routes: <String, WidgetBuilder>{
           '/': (context) => homeScreen,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:loader_overlay/loader_overlay.dart';
 import 'splashLogic.dart';
+import '../providers/globalHeroProvider.dart' as globalHero;
 
 // ignore: must_be_immutable
 class SplashUI extends StatefulWidget {
@@ -15,6 +15,8 @@ class SplashUI extends StatefulWidget {
 class _SplashUIState extends State<SplashUI> {
   @override
   void initState() {
+    print(globalHero.isLoggedIn);
+    widget.splashStream.startLogic();
     super.initState();
   }
 
@@ -27,22 +29,20 @@ class _SplashUIState extends State<SplashUI> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: widget.splashStream.counterStream,
+        stream: widget.splashStream.splashStream,
         builder: (context, snapshot) {
-          Future.delayed(Duration(seconds: 1), () {
-            widget.splashStream.displayLoading();
-            context.showLoaderOverlay();
-          });
-          return LoaderOverlay(
-              useDefaultLoading: true,
-              overlayOpacity: 0.8,
-              child: Image.asset(
-                "assets/imgs/home.JPEG",
-                fit: BoxFit.cover,
-                height: double.infinity,
-                width: double.infinity,
-                alignment: Alignment.center,
-              ));
+          print(globalHero.isLoggedIn);
+          return Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(widget.splashStream.wallpaper),
+                  fit: BoxFit.cover,
+                  colorFilter: new ColorFilter.mode(
+                      Colors.black.withOpacity(0.5), BlendMode.dstATop),
+                ),
+              ),
+              // use any child here
+              child: Center(child: CircularProgressIndicator()));
         });
   }
 }

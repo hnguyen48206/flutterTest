@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'introLogic.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 final List<String> imgList = [
@@ -8,6 +9,8 @@ final List<String> imgList = [
 ];
 
 class IntroUI extends StatelessWidget {
+  IntroLogic introStream = new IntroLogic();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -15,7 +18,8 @@ class IntroUI extends StatelessWidget {
           children: <Widget>[
             Container(
               child: CarouselSlider(
-                options: CarouselOptions(),
+                options: CarouselOptions(
+                    onPageChanged: introStream.onSlideChanged()),
                 items: imgList
                     .map((item) => Container(
                           child: Center(

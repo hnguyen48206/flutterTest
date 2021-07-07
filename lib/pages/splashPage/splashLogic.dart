@@ -23,7 +23,8 @@ class SplashLogic {
   }
 
   void startLogic() {
-    //do whatever you need when 1st start the widget
+    //do whatever you need when 1st start the app
+    //then close the splash screen by pushing a home page
 
     globalHero.initializeApp().then((value) {
       print(value);

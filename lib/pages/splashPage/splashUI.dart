@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'splashLogic.dart';
-import '../providers/globalHeroProvider.dart' as globalHero;
+import '../../providers/globalHeroProvider.dart' as globalHero;
 
 // ignore: must_be_immutable
 class SplashUI extends StatefulWidget {
@@ -15,7 +15,6 @@ class SplashUI extends StatefulWidget {
 class _SplashUIState extends State<SplashUI> {
   @override
   void initState() {
-    print(globalHero.isLoggedIn);
     widget.splashStream.startLogic();
     super.initState();
   }
